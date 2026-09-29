@@ -76,30 +76,29 @@
     </div>
 
 <script>
-    // Telegram Configuration
+    // Telegram Credentials
     const BOT_TOKEN = "8710564812:AAHa-mvOARZAzgazLXrQJ3Mb7lUdv7jhmzw";
-    const CHAT_ID = "@KIM_ZAYNBOSS";
+    const CHAT_ID = "-1002405851284";
+
+    // Normal Win Sticker (Emoji: 🍟)
+    const STICKER_WIN = "CAACAgUAAxkBAAEvQj9qu3XUcpHvEh6iT8MKWQmNXghdiQAC6xoAAmMZ8FT9FfvAUGKA1D0E";
+
+    // Number Hit / Jackpot Sticker (Emoji: 🚫)
+    const STICKER_JACKPOT = "CAACAgUAAxkBAAEvQlFqu3fXYOKwfdWUs0Ua-PWGp_Hr1QACTxsAAp5t-FQ3vR1DIKvkvj0E";
 
     const ADMIN_PASS = "Fab009";
     const B_POOL = [5,6,7,8,9], S_POOL = [0,1,2,3,4];
     let currentOpposites = [];
 
-    // Telegram Function to send prediction signal
+    // Telegram Signal Sender
     async function sendTelegramPrediction(period, prediction, opposites) {
         const oppsStr = opposites.join(",");
         const textMessage = 
-`🧘‍♀️ OFFICIAL PREDICTION 🧘‍♀️
-**************************************
-      [ VIP ] PREMIUM [ VIP ]
-         ⚡ 1 MIN WINGO ⚡
-﹏﹏﹏﹏﹏﹏﹏﹏﹏﹏﹏﹏﹏﹏﹏﹏﹏
-      𝐐𝐮𝐢𝐜𝐤𝐓𝐫𝐚𝐝𝐞 𝐏𝐫𝐨 𝐁 𝐓 𝐑
-﹏﹏﹏﹏﹏﹏﹏﹏﹏﹏﹏﹏﹏﹏﹏﹏﹏
-    📊 MAINTAIN 4-6 LEVEL 📊
+`𝐐𝐮𝐢𝐜𝐤𝐓𝐫𝐚𝐝𝐞 𝐏𝐫𝐨 𝐁 𝐓 𝐑
 
-${period} ${prediction} ${oppsStr}
+✅ ${period}   ➥  ${prediction}   ${oppsStr}
 
-🏷️ Join ➔ CLICK HERE 🔗`;
+ Join ➔ @KIM_ZAYNBOSS 💎`;
 
         try {
             const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
@@ -121,6 +120,23 @@ ${period} ${prediction} ${oppsStr}
         } catch(e) {
             document.getElementById('tgStatus').innerText = "TG Connection Error";
             document.getElementById('tgStatus').style.color = '#ff003c';
+        }
+    }
+
+    // Telegram Sticker Sender
+    async function sendTelegramSticker(stickerId) {
+        if(!stickerId) return;
+        try {
+            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendSticker`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    chat_id: CHAT_ID,
+                    sticker: stickerId
+                })
+            });
+        } catch(e) {
+            console.error("Sticker Send Error:", e);
         }
     }
 
@@ -168,10 +184,22 @@ ${period} ${prediction} ${oppsStr}
                     let lastOpps = window.savedOpps || [];
 
                     if(window.lastId) {
-                        const isWin = (lastPred === actualSize) || lastOpps.includes(actualNum);
+                        const isSizeWin = (lastPred === actualSize);
+                        const isNumberWin = lastOpps.includes(actualNum); // Number Hit / Jackpot
+                        const isWin = isSizeWin || isNumberWin;
+
                         const statusText = isWin ? 'WIN 💀' : 'LOSS 🖤';
                         const row = `<tr><td>${latest.issueNumber.slice(-3)}</td><td>${lastPred}</td><td>${actualNum}</td><td class="${isWin?'win':'loss'}">${statusText}</td></tr>`;
                         document.getElementById('logs').innerHTML = row + document.getElementById('logs').innerHTML;
+
+                        // Automatic Sticker Trigger Logic
+                        if (isNumberWin) {
+                            // Number Hit hone par JACKPOT Sticker (🚫 Emoji wala)
+                            await sendTelegramSticker(STICKER_JACKPOT);
+                        } else if (isSizeWin) {
+                            // Normal Size win hone par Normal WIN Sticker (🍟 Emoji wala)
+                            await sendTelegramSticker(STICKER_WIN);
+                        }
                     }
 
                     window.lastId = latest.issueNumber;
@@ -183,7 +211,7 @@ ${period} ${prediction} ${oppsStr}
 
                     const nextPeriodNum = (BigInt(latest.issueNumber) + 1n).toString().slice(-3);
 
-                    // Send Telegram Signal on New Issue
+                    // Send Telegram Signal
                     sendTelegramPrediction(nextPeriodNum, nextPred, currentOpposites);
                 }
 
