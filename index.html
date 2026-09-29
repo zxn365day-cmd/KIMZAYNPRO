@@ -25,6 +25,17 @@
         .hidden { display: none; }
         .overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:999; }
         #tgStatus { font-size: 12px; margin-top: 10px; color: var(--gold); }
+        
+        /* Toggle Switch UI Styling */
+        .toggle-container { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 12px; padding: 8px; background: rgba(255,255,255,0.02); border-radius: 10px; border: 1px solid #222; }
+        .switch { position: relative; display: inline-block; width: 46px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; margin: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .3s; border-radius: 24px; border: 1px solid #555; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: #fff; transition: .3s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--neon); border-color: var(--neon); }
+        input:checked + .slider:before { transform: translateX(22px); background-color: #000; }
+        .toggle-label { font-size: 11px; font-weight: bold; letter-spacing: 1px; color: #ccc; }
+        #wakeLockStatus { font-size: 10px; color: #666; margin-top: 5px; }
     </style>
 </head>
 <body oncontextmenu="return false;">
@@ -48,6 +59,17 @@
         <div class="pred-val" id="pRes">WAIT...</div>
         <div style="color: var(--gold); font-size: 13px; font-weight: bold; border:1px dashed var(--gold); padding:8px;" id="pOpps">ANALYZING...</div>
         <div id="tgStatus">Telegram Signal: Idle</div>
+
+        <!-- ON/OFF Toggle Switch for Telegram Signals -->
+        <div class="toggle-container">
+            <span class="toggle-label">TELEGRAM SIGNAL:</span>
+            <label class="switch">
+                <input type="checkbox" id="tgToggle" onchange="toggleTgSignals(this.checked)">
+                <span class="slider"></span>
+            </label>
+            <span id="toggleText" style="font-size: 11px; font-weight: bold; color: var(--danger);">OFF</span>
+        </div>
+        <div id="wakeLockStatus">Keep-Alive: Initializing...</div>
 
         <table>
             <thead><tr><th>PRD</th><th>PRED</th><th>NUM</th><th>STATUS</th></tr></thead>
@@ -90,13 +112,101 @@
     const B_POOL = [5,6,7,8,9], S_POOL = [0,1,2,3,4];
     let currentOpposites = [];
 
+    // Global Telegram Control Variable
+    let isTelegramActive = false;
+
+    // --- SCREEN WAKE LOCK & BACKGROUND AUDIO KEEP-ALIVE ---
+    let wakeLock = null;
+
+    async function enableWakeLock() {
+        try {
+            if ('wakeLock' in navigator) {
+                wakeLock = await navigator.wakeLock.request('screen');
+                document.getElementById('wakeLockStatus').innerText = "Keep-Alive: Screen Wake Lock Active";
+                document.getElementById('wakeLockStatus').style.color = "var(--neon)";
+            } else {
+                document.getElementById('wakeLockStatus').innerText = "Keep-Alive: Audio Mode Active";
+            }
+        } catch (err) {
+            document.getElementById('wakeLockStatus').innerText = "Keep-Alive: Active";
+        }
+    }
+
+    // Play silent audio loop to prevent browser freeze in background
+    function enableSilentAudioKeepAlive() {
+        try {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            oscillator.type = 'sine';
+            oscillator.frequency.value = 200; // Almost inaudible frequency
+            gainNode.gain.value = 0.0001; // Silent volume
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.start();
+        } catch(e) {}
+    }
+
+    // Re-enable Wake Lock if tab becomes visible again
+    document.addEventListener('visibilitychange', async () => {
+        if (wakeLock !== null && document.visibilityState === 'visible') {
+            await enableWakeLock();
+        }
+    });
+
+    // Load Toggle state from LocalStorage
+    function initTgToggle() {
+        const savedState = localStorage.getItem('TG_SIGNAL_ACTIVE');
+        const tgToggle = document.getElementById('tgToggle');
+        const toggleText = document.getElementById('toggleText');
+
+        if(savedState === 'true') {
+            isTelegramActive = true;
+            if(tgToggle) tgToggle.checked = true;
+            if(toggleText) {
+                toggleText.innerText = "ON";
+                toggleText.style.color = "var(--neon)";
+            }
+        } else {
+            isTelegramActive = false;
+            if(tgToggle) tgToggle.checked = false;
+            if(toggleText) {
+                toggleText.innerText = "OFF";
+                toggleText.style.color = "var(--danger)";
+            }
+        }
+    }
+
+    function toggleTgSignals(checked) {
+        isTelegramActive = checked;
+        localStorage.setItem('TG_SIGNAL_ACTIVE', checked);
+        const toggleText = document.getElementById('toggleText');
+        const tgStatus = document.getElementById('tgStatus');
+        
+        if(checked) {
+            toggleText.innerText = "ON";
+            toggleText.style.color = "var(--neon)";
+            tgStatus.innerText = "Telegram Signal: Active (ON)";
+            tgStatus.style.color = "var(--neon)";
+        } else {
+            toggleText.innerText = "OFF";
+            toggleText.style.color = "var(--danger)";
+            tgStatus.innerText = "Telegram Signal: Disabled (OFF)";
+            tgStatus.style.color = "#888";
+        }
+    }
+
     // Telegram Signal Sender
     async function sendTelegramPrediction(period, prediction, opposites) {
+        if(!isTelegramActive) return; // Skip sending if OFF
+
         const oppsStr = opposites.join(",");
         const textMessage = 
 `𝐐𝐮𝐢𝐜𝐤𝐓𝐫𝐚𝐝𝐞 𝐏𝐫𝐨 𝐁 𝐓 𝐑
 
-✅ ${period}   ➥  ${prediction}   ${oppsStr}
+✅ ${period}   ➥  ${prediction}   ${oppsStr}
 
  Join ➔ @KIM_ZAYNBOSS 💎`;
 
@@ -125,7 +235,7 @@
 
     // Telegram Sticker Sender
     async function sendTelegramSticker(stickerId) {
-        if(!stickerId) return;
+        if(!isTelegramActive || !stickerId) return; // Skip sending if OFF
         try {
             await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendSticker`, {
                 method: "POST",
@@ -150,6 +260,7 @@
     }
 
     window.onload = () => {
+        initTgToggle();
         const savedKey = localStorage.getItem('FB_ACTIVE_KEY') || localStorage.getItem('SR_ACTIVE_KEY');
         if(savedKey && validateKeyFormat(savedKey)) {
             document.getElementById('keyIn').value = savedKey;
@@ -163,63 +274,82 @@
             localStorage.setItem('FB_ACTIVE_KEY', key);
             document.getElementById('loginPage').classList.add('hidden');
             document.getElementById('appPage').classList.remove('hidden');
+            
+            // Enable Keep-Alive mechanisms on activation
+            enableWakeLock();
+            enableSilentAudioKeepAlive();
+            
+            initTgToggle();
             runLogic();
         } else { document.getElementById('err').innerText = "INVALID KEY!"; }
     }
 
-    async function runLogic() {
-        setInterval(async () => {
-            try {
-                const res = await fetch('https://draw.ar-lottery01.com/WinGo/WinGo_1M/GetHistoryIssuePage.json');
-                const json = await res.json();
-                const latest = json.data.list[0];
+    async function fetchAndProcessPrediction() {
+        try {
+            const res = await fetch('https://draw.ar-lottery01.com/WinGo/WinGo_1M/GetHistoryIssuePage.json');
+            const json = await res.json();
+            const latest = json.data.list[0];
 
-                const last5 = json.data.list.slice(0, 5).map(x => parseInt(x.number) >= 5 ? "BIG" : "SMALL");
-                const nextPred = last5.filter(x => x === "BIG").length > 2 ? "BIG" : "SMALL";
+            const last5 = json.data.list.slice(0, 5).map(x => parseInt(x.number) >= 5 ? "BIG" : "SMALL");
+            const nextPred = last5.filter(x => x === "BIG").length > 2 ? "BIG" : "SMALL";
 
-                if(window.lastId !== latest.issueNumber) {
-                    const actualNum = parseInt(latest.number);
-                    const actualSize = actualNum >= 5 ? "BIG" : "SMALL";
-                    let lastPred = window.savedPrediction || nextPred;
-                    let lastOpps = window.savedOpps || [];
+            if(window.lastId !== latest.issueNumber) {
+                const actualNum = parseInt(latest.number);
+                const actualSize = actualNum >= 5 ? "BIG" : "SMALL";
+                let lastPred = window.savedPrediction || nextPred;
+                let lastOpps = window.savedOpps || [];
 
-                    if(window.lastId) {
-                        const isSizeWin = (lastPred === actualSize);
-                        const isNumberWin = lastOpps.includes(actualNum); // Number Hit / Jackpot
-                        const isWin = isSizeWin || isNumberWin;
+                if(window.lastId) {
+                    const isSizeWin = (lastPred === actualSize);
+                    const isNumberWin = lastOpps.includes(actualNum); // Number Hit / Jackpot
+                    const isWin = isSizeWin || isNumberWin;
 
-                        const statusText = isWin ? 'WIN 💀' : 'LOSS 🖤';
-                        const row = `<tr><td>${latest.issueNumber.slice(-3)}</td><td>${lastPred}</td><td>${actualNum}</td><td class="${isWin?'win':'loss'}">${statusText}</td></tr>`;
-                        document.getElementById('logs').innerHTML = row + document.getElementById('logs').innerHTML;
+                    const statusText = isWin ? 'WIN 💀' : 'LOSS 🖤';
+                    const row = `<tr><td>${latest.issueNumber.slice(-3)}</td><td>${lastPred}</td><td>${actualNum}</td><td class="${isWin?'win':'loss'}">${statusText}</td></tr>`;
+                    document.getElementById('logs').innerHTML = row + document.getElementById('logs').innerHTML;
 
-                        // Automatic Sticker Trigger Logic
-                        if (isNumberWin) {
-                            // Number Hit hone par JACKPOT Sticker (🚫 Emoji wala)
-                            await sendTelegramSticker(STICKER_JACKPOT);
-                        } else if (isSizeWin) {
-                            // Normal Size win hone par Normal WIN Sticker (🍟 Emoji wala)
-                            await sendTelegramSticker(STICKER_WIN);
-                        }
+                    // Automatic Sticker Trigger Logic
+                    if (isNumberWin) {
+                        await sendTelegramSticker(STICKER_JACKPOT);
+                    } else if (isSizeWin) {
+                        await sendTelegramSticker(STICKER_WIN);
                     }
-
-                    window.lastId = latest.issueNumber;
-                    window.savedPrediction = nextPred;
-                    
-                    const pool = nextPred === "BIG" ? S_POOL : B_POOL;
-                    currentOpposites = pool.sort(() => 0.5 - Math.random()).slice(0, 2);
-                    window.savedOpps = currentOpposites;
-
-                    const nextPeriodNum = (BigInt(latest.issueNumber) + 1n).toString().slice(-3);
-
-                    // Send Telegram Signal
-                    sendTelegramPrediction(nextPeriodNum, nextPred, currentOpposites);
                 }
 
-                document.getElementById('pID').innerText = "PERIOD: " + (BigInt(latest.issueNumber) + 1n).toString();
-                document.getElementById('pRes').innerText = nextPred;
-                document.getElementById('pOpps').innerText = "OPPOSITE NUMS: " + currentOpposites.join(", ");
-            } catch(e) {}
-        }, 3000);
+                window.lastId = latest.issueNumber;
+                window.savedPrediction = nextPred;
+                
+                const pool = nextPred === "BIG" ? S_POOL : B_POOL;
+                currentOpposites = pool.sort(() => 0.5 - Math.random()).slice(0, 2);
+                window.savedOpps = currentOpposites;
+
+                const nextPeriodNum = (BigInt(latest.issueNumber) + 1n).toString().slice(-3);
+
+                // Send Telegram Signal
+                sendTelegramPrediction(nextPeriodNum, nextPred, currentOpposites);
+            }
+
+            document.getElementById('pID').innerText = "PERIOD: " + (BigInt(latest.issueNumber) + 1n).toString();
+            document.getElementById('pRes').innerText = nextPred;
+            document.getElementById('pOpps').innerText = "OPPOSITE NUMS: " + currentOpposites.join(", ");
+        } catch(e) {}
+    }
+
+    async function runLogic() {
+        // Web Worker to keep timer running even when tab is blurred/backgrounded
+        const workerBlob = new Blob([`
+            setInterval(() => {
+                postMessage('tick');
+            }, 3000);
+        `], { type: 'application/javascript' });
+
+        const worker = new Worker(URL.createObjectURL(workerBlob));
+        worker.onmessage = function() {
+            fetchAndProcessPrediction();
+        };
+
+        // Initial Execution
+        fetchAndProcessPrediction();
     }
 
     function triggerAdmin() {
