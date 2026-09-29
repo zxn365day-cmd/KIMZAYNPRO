@@ -1,275 +1,225 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no" />
-<title>PREDICTION TOOL V1</title> 
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;900&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
-
-<style>
-:root {
-  --neon-pink: #ff2d75;
-  --neon-cyan: #00e5ff;
-  --bg-dark: rgba(10, 10, 25, 0.95);
-  --gold: #ffea00;
-}
-
-* { box-sizing: border-box; touch-action: none; user-select: none; }
-body { margin: 0; background: #000; font-family: 'Orbitron', sans-serif; overflow: hidden; width: 100vw; height: 100vh; }
-
-input {
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #fff;
-  font-family: 'Orbitron', sans-serif;
-  text-align: center;
-  outline: none;
-  width: 100%;
-  border-radius: 5px;
-  padding: 5px;
-  font-size: 11px;
-}
-input:focus { border-color: var(--neon-cyan); }
-
-#hack-popup {
-  position: fixed; z-index: 9999; width: 220px;
-  top: 20%; left: 50%;
-  transform: translateX(-50%);
-  background: linear-gradient(135deg, rgba(20, 20, 40, 0.9), rgba(10, 10, 25, 0.95));
-  border: 1px solid rgba(0, 229, 255, 0.4);
-  border-radius: 20px;
-  padding: 12px;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.8), 0 0 10px rgba(0, 229, 255, 0.2);
-  backdrop-filter: blur(10px);
-  text-align: center;
-  color: #fff;
-  will-change: transform;
-}
-
-.header { display: flex; align-items: center; justify-content: start; gap: 8px; margin-bottom: 10px; }
-.logo-diamond { width: 20px; height: 20px; background: linear-gradient(135deg, #fff, var(--neon-cyan)); clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); animation: pulse 2s infinite; }
-@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-
-.header-text { text-align: left; }
-.header-text h1 { font-size: 10px; margin: 0; color: #fff; letter-spacing: 1px; font-weight: 900; }
-.header-text p { font-size: 7px; margin: 0; color: var(--neon-cyan); letter-spacing: 0.5px; }
-
-.period-box {
-  background: rgba(255,255,255,0.05);
-  border-radius: 8px;
-  padding: 6px;
-  margin-bottom: 8px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 10px;
-  border: 1px dashed rgba(255,255,255,0.1);
-  color: var(--gold);
-}
-
-.result-display {
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 10px;
-  padding: 10px 5px;
-  margin: 8px 0;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  position: relative;
-  overflow: hidden;
-}
-
-.scan-effect {
-  position: absolute; top: -100%; left: 0; width: 100%; height: 100%;
-  background: linear-gradient(to bottom, transparent, var(--neon-cyan), transparent);
-  opacity: 0.3; pointer-events: none; display: none;
-}
-
-@keyframes scanMove { 0% { top: -100%; } 100% { top: 100%; } }
-
-#prediction-text { 
-  font-size: 24px; font-weight: 900; letter-spacing: 2px; text-shadow: 0 0 10px rgba(255, 255, 255, 0.5); 
-  color: #fff; border: none; background: transparent; width: 100%; text-align: center;
-}
-
-#number-text { 
-  color: var(--neon-cyan); margin-top: 5px; font-weight: bold; text-transform: uppercase; 
-  border: none; background: transparent; width: 100%; text-align: center;
-}
-
-.status-msg { font-size: 7px; color: #666; margin-top: 5px; text-transform: uppercase; }
-
-.btn-group { display: flex; gap: 6px; margin-top: 10px; }
-button {
-  flex: 1; padding: 8px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.2); 
-  font-family: 'Orbitron', sans-serif; font-weight: 600; font-size: 9px; cursor: pointer;
-  transition: 0.3s; background: #1a1a1a; color: #fff;
-}
-
-.btn-get { background: var(--neon-cyan); color: #000; border: none; font-weight: 900; }
-.btn-get:disabled { background: #444; color: #ccc; cursor: not-allowed; }
-
-#show-btn {
-  position: fixed; bottom: 30px; right: 20px; z-index: 10000;
-  width: 40px; height: 40px; border-radius: 50%; background: var(--neon-cyan);
-  border: 2px solid #fff; color: #000; display: none; box-shadow: 0 0 15px var(--neon-cyan);
-  font-size: 14px; cursor: pointer;
-}
-
-.hidden { opacity: 0; pointer-events: none; transform: translate(-50%, 20px) scale(0.9) !important; }
-.game-wrap { position: absolute; inset: 0; z-index: 1; }
-.game-iframe { width: 100%; height: 100%; border: 0; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KIM ZAYN</title>
+    <style>
+        :root { --neon: #00ff41; --danger: #ff003c; --gold: #ffea00; --bg: #050505; }
+        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; margin: 0; user-select: none; overflow-x: hidden; }
+        .header-container { text-align: center; padding: 30px 10px; }
+        .zigzag-name { font-size: 38px; font-weight: 900; letter-spacing: 5px; color: #fff; text-transform: uppercase; text-shadow: 2px 2px var(--danger), -2px -2px var(--neon), 0 0 20px var(--neon); animation: glitch 1.5s infinite; }
+        @keyframes glitch { 0% { transform: skew(0deg); } 20% { transform: skew(-3deg); text-shadow: 2px 2px var(--neon), -2px -2px var(--danger); } 40% { transform: skew(3deg); } 100% { transform: skew(0deg); } }
+        .glass-box { max-width: 400px; margin: 0 auto 20px; background: rgba(255,255,255,0.03); border: 1px solid rgba(0,255,65,0.2); border-radius: 25px; padding: 25px; backdrop-filter: blur(15px); text-align: center; }
+        input { width: 100%; padding: 15px; background: rgba(0,0,0,0.6); border: 1px solid #333; border-radius: 12px; color: var(--neon); font-size: 16px; margin: 15px 0; outline: none; text-align: center; box-sizing: border-box; }
+        .btn-main { width: 100%; padding: 15px; background: linear-gradient(45deg, var(--neon), #008f11); border: none; border-radius: 12px; color: #000; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; }
+        .pred-val { font-size: 55px; font-weight: 900; margin: 10px 0; text-shadow: 0 0 20px var(--neon); }
+        .footer-branding { margin-top: 30px; padding: 15px; text-align: center; }
+        .name-box { display: inline-block; padding: 10px 30px; border: 1px solid var(--neon); border-radius: 5px; color: var(--neon); font-weight: bold; letter-spacing: 3px; cursor: pointer; background: rgba(0, 255, 65, 0.05); }
+        .admin-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 350px; background: #000; border: 2px solid var(--gold); border-radius: 20px; padding: 20px; z-index: 1000; box-sizing: border-box; }
+        table { width: 100%; margin-top: 20px; border-collapse: collapse; font-size: 11px; }
+        th { color: #888; border-bottom: 1px solid #222; padding: 8px; }
+        td { padding: 10px; border-bottom: 1px solid #111; text-align: center; }
+        .win { color: var(--neon); font-weight: bold; }
+        .loss { color: var(--danger); font-weight: bold; }
+        .hidden { display: none; }
+        .overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:999; }
+        #tgStatus { font-size: 12px; margin-top: 10px; color: var(--gold); }
+    </style>
 </head>
-<body>
+<body oncontextmenu="return false;">
 
-<div id="hack-popup">
-  <div class="header">
-    <div class="logo-diamond"></div>
-    <div class="header-text">
-      <h1>PREDICTION TOOL</h1>
-      <p>SYSTEM VERSION 1.0</p>
+    <div class="header-container">
+        <div class="zigzag-name">𝐐𝐮𝐢𝐜𝐤𝐓𝐫𝐚𝐝𝐞 𝐏𝐫𝐨</div>
+        <div style="color: var(--gold); font-size: 10px; letter-spacing: 4px; margin-top: 5px;">OWNER KIM ZAYN</div>
     </div>
-  </div>
 
-  <div class="period-box">
-    <span>✦ NEXT</span>
-    <input type="text" id="period-val" value="---" readonly>
-  </div>
+    <!-- Login Screen -->
+    <div id="loginPage" class="glass-box">
+        <h3 style="margin:0; color:var(--neon); font-size: 14px;">ENTER LICENSE</h3>
+        <input type="text" id="keyIn" placeholder="FB-VIP-XXXXX">
+        <button class="btn-main" onclick="startSystem()">ACTIVATE</button>
+        <p id="err" style="color:var(--danger); font-size: 12px; margin-top: 10px;"></p>
+    </div>
 
-  <div class="result-display">
-    <div class="scan-effect" id="scanner"></div>
-    <input type="text" id="prediction-text" value="READY" readonly>
-    <input type="text" id="number-text" value="Waiting..." readonly>
-    <div class="status-msg" id="server-status">ENCRYPTED</div>
-  </div>
+    <!-- Main Application Screen -->
+    <div id="appPage" class="glass-box hidden">
+        <div style="color: #888; font-size: 13px;" id="pID">PERIOD: ---</div>
+        <div class="pred-val" id="pRes">WAIT...</div>
+        <div style="color: var(--gold); font-size: 13px; font-weight: bold; border:1px dashed var(--gold); padding:8px;" id="pOpps">ANALYZING...</div>
+        <div id="tgStatus">Telegram Signal: Idle</div>
 
-  <div class="btn-group">
-    <button class="btn-get" id="analysis-btn" onclick="generateResult()">GET</button>
-    <button class="btn-hide" onclick="toggleHack()">HIDE</button>
-  </div>
-</div>
+        <table>
+            <thead><tr><th>PRD</th><th>PRED</th><th>NUM</th><th>STATUS</th></tr></thead>
+            <tbody id="logs"></tbody>
+        </table>
+        <button onclick="logout()" style="background:transparent; color:#444; border:none; margin-top:15px; font-size:10px; cursor:pointer;">LOGOUT</button>
+    </div>
 
-<button id="show-btn" onclick="toggleHack()">⚡</button>
+    <!-- VIP Admin Panel Trigger -->
+    <div class="footer-branding">
+        <div class="name-box" onclick="triggerAdmin()">𝗩𝗜𝗣</div>
+    </div>
 
-<div class="game-wrap">
-  <iframe class="game-iframe" src="https://22yaarwin.com/#/register?invitationCode=18658835947"></iframe>
-</div>
+    <!-- Admin Panel Modal -->
+    <div id="overlay" class="overlay hidden" onclick="closeAdmin()"></div>
+    <div id="adminPanel" class="admin-modal hidden">
+        <h3 style="color: var(--gold); text-align: center; margin-top:0;">MASTER CONTROL</h3>
+        <select id="keyValidity" style="width: 100%; padding: 12px; background: #111; color: #fff; border: 1px solid #444; border-radius: 8px;">
+            <option value="30">30 MINUTES</option>
+            <option value="1440">1 DAY</option>
+            <option value="10080">7 DAYS</option>
+            <option value="43200">30 DAYS</option>
+        </select>
+        <button class="btn-main" style="background: var(--gold); color: #000; margin-top: 15px;" onclick="genKey()">GENERATE KEY</button>
+        <div id="outKey" style="margin-top: 15px; color: var(--neon); font-size: 11px; word-break: break-all;"></div>
+    </div>
 
 <script>
-let lastFetchedId = "";
-let lockedIssue = ""; 
+    // Telegram Configuration
+    const BOT_TOKEN = "8710564812:AAHa-mvOARZAzgazLXrQJ3Mb7lUdv7jhmzw";
+    const CHAT_ID = "@KIM_ZAYNBOSS";
 
-interact('#hack-popup').draggable({
-  inertia: true,
-  modifiers: [interact.modifiers.restrictRect({ restriction: 'parent', endOnly: true })],
-  listeners: {
-    move (event) {
-      const target = event.target;
-      const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
-      const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
-      target.style.transform = `translate(calc(-50% + ${x}px), ${y}px)`;
-      target.setAttribute('data-x', x);
-      target.setAttribute('data-y', y);
+    const ADMIN_PASS = "Fab009";
+    const B_POOL = [5,6,7,8,9], S_POOL = [0,1,2,3,4];
+    let currentOpposites = [];
+
+    // Telegram Function to send prediction signal
+    async function sendTelegramPrediction(period, prediction, opposites) {
+        const oppsStr = opposites.join(",");
+        const textMessage = 
+`🧘‍♀️ OFFICIAL PREDICTION 🧘‍♀️
+**************************************
+      [ VIP ] PREMIUM [ VIP ]
+         ⚡ 1 MIN WINGO ⚡
+﹏﹏﹏﹏﹏﹏﹏﹏﹏﹏﹏﹏﹏﹏﹏﹏﹏
+      𝐐𝐮𝐢𝐜𝐤𝐓𝐫𝐚𝐝𝐞 𝐏𝐫𝐨 𝐁 𝐓 𝐑
+﹏﹏﹏﹏﹏﹏﹏﹏﹏﹏﹏﹏﹏﹏﹏﹏﹏
+    📊 MAINTAIN 4-6 LEVEL 📊
+
+${period} ${prediction} ${oppsStr}
+
+🏷️ Join ➔ CLICK HERE 🔗`;
+
+        try {
+            const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    chat_id: CHAT_ID,
+                    text: textMessage
+                })
+            });
+            const data = await res.json();
+            if(data.ok) {
+                document.getElementById('tgStatus').innerText = `Telegram Signal Sent (${period})`;
+                document.getElementById('tgStatus').style.color = '#00ff41';
+            } else {
+                document.getElementById('tgStatus').innerText = `TG Error: ${data.description}`;
+                document.getElementById('tgStatus').style.color = '#ff003c';
+            }
+        } catch(e) {
+            document.getElementById('tgStatus').innerText = "TG Connection Error";
+            document.getElementById('tgStatus').style.color = '#ff003c';
+        }
     }
-  }
-});
 
-function toggleHack() {
-  const popup = document.getElementById('hack-popup');
-  const showBtn = document.getElementById('show-btn');
-  if (popup.classList.contains('hidden')) {
-    popup.classList.remove('hidden');
-    showBtn.style.display = 'none';
-  } else {
-    popup.classList.add('hidden');
-    showBtn.style.display = 'block';
-  }
-}
+    function validateKeyFormat(key) {
+        if(!key.startsWith("FB-VIP-") && !key.startsWith("SR-VIP-")) return false;
+        try {
+            const parts = key.split("-");
+            const expiry = parseInt(atob(parts[3]));
+            return expiry > Date.now();
+        } catch(e) { return false; }
+    }
 
-async function fetchGameData() {
-    try {
-        const response = await fetch('https://draw.ar-lottery01.com/WinGo/WinGo_1M/GetHistoryIssuePage.json');
-        const data = await response.json();
-        return data.data.list;
-    } catch (e) { return null; }
-}
+    window.onload = () => {
+        const savedKey = localStorage.getItem('FB_ACTIVE_KEY') || localStorage.getItem('SR_ACTIVE_KEY');
+        if(savedKey && validateKeyFormat(savedKey)) {
+            document.getElementById('keyIn').value = savedKey;
+            startSystem();
+        }
+    };
 
-async function updatePeriod() {
-  const list = await fetchGameData();
-  if(list) {
-      const latestIssue = list[0].issueNumber;
-      const nextIssueFull = (BigInt(latestIssue) + 1n).toString();
-      const displayPeriod = nextIssueFull.slice(-5);
-      
-      document.getElementById('period-val').value = displayPeriod;
-      
-      if(lastFetchedId !== latestIssue) {
-          document.getElementById('server-status').textContent = "NEW PERIOD";
-          document.getElementById('prediction-text').value = "READY";
-          document.getElementById('number-text').value = "Waiting...";
-          lockedIssue = ""; 
-      }
-      lastFetchedId = latestIssue;
-      return list;
-  }
-  return null;
-}
+    function startSystem() {
+        const key = document.getElementById('keyIn').value.trim();
+        if(validateKeyFormat(key)) {
+            localStorage.setItem('FB_ACTIVE_KEY', key);
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('appPage').classList.remove('hidden');
+            runLogic();
+        } else { document.getElementById('err').innerText = "INVALID KEY!"; }
+    }
 
-async function generateResult() {
-  const currentPeriod = document.getElementById('period-val').value;
-  
-  if (lockedIssue === currentPeriod && currentPeriod !== "---") {
-      return; 
-  }
+    async function runLogic() {
+        setInterval(async () => {
+            try {
+                const res = await fetch('https://draw.ar-lottery01.com/WinGo/WinGo_1M/GetHistoryIssuePage.json');
+                const json = await res.json();
+                const latest = json.data.list[0];
 
-  const btn = document.getElementById('analysis-btn');
-  const predText = document.getElementById('prediction-text');
-  const numText = document.getElementById('number-text');
-  const scanner = document.getElementById('scanner');
-  
-  btn.disabled = true;
-  scanner.style.display = "block";
-  scanner.style.animation = "scanMove 0.8s linear infinite";
-  predText.value = "SCANNING...";
-  numText.style.color = "var(--neon-cyan)";
-  numText.value = "Analyzing...";
+                const last5 = json.data.list.slice(0, 5).map(x => parseInt(x.number) >= 5 ? "BIG" : "SMALL");
+                const nextPred = last5.filter(x => x === "BIG").length > 2 ? "BIG" : "SMALL";
 
-  const list = await updatePeriod(); 
-  
-  setTimeout(() => {
-    if (list) {
-      let score = 0;
-      const history = list.slice(0, 10);
-      
-      history.forEach((item, index) => {
-        const weight = 10 - index; 
-        const isBig = parseInt(item.number) >= 5;
-        score += isBig ? weight : -weight;
-      });
+                if(window.lastId !== latest.issueNumber) {
+                    const actualNum = parseInt(latest.number);
+                    const actualSize = actualNum >= 5 ? "BIG" : "SMALL";
+                    let lastPred = window.savedPrediction || nextPred;
+                    let lastOpps = window.savedOpps || [];
 
-      const nextSize = score >= 0 ? "BIG" : "SMALL";
-      const pool = nextSize === "BIG" ? [0,1,2,3,4] : [5,6,7,8,9];
-      const opposites = pool.sort(() => 0.5 - Math.random()).slice(0, 2);
-      
-      predText.value = nextSize;
-      numText.value = "OPP: " + opposites.join(", ");
-      document.getElementById('server-status').textContent = "SUCCESS";
-      
-      lockedIssue = document.getElementById('period-val').value;
-    } else {
-      predText.value = "ERROR";
-      numText.value = "No Data";
+                    if(window.lastId) {
+                        const isWin = (lastPred === actualSize) || lastOpps.includes(actualNum);
+                        const statusText = isWin ? 'WIN 💀' : 'LOSS 🖤';
+                        const row = `<tr><td>${latest.issueNumber.slice(-3)}</td><td>${lastPred}</td><td>${actualNum}</td><td class="${isWin?'win':'loss'}">${statusText}</td></tr>`;
+                        document.getElementById('logs').innerHTML = row + document.getElementById('logs').innerHTML;
+                    }
+
+                    window.lastId = latest.issueNumber;
+                    window.savedPrediction = nextPred;
+                    
+                    const pool = nextPred === "BIG" ? S_POOL : B_POOL;
+                    currentOpposites = pool.sort(() => 0.5 - Math.random()).slice(0, 2);
+                    window.savedOpps = currentOpposites;
+
+                    const nextPeriodNum = (BigInt(latest.issueNumber) + 1n).toString().slice(-3);
+
+                    // Send Telegram Signal on New Issue
+                    sendTelegramPrediction(nextPeriodNum, nextPred, currentOpposites);
+                }
+
+                document.getElementById('pID').innerText = "PERIOD: " + (BigInt(latest.issueNumber) + 1n).toString();
+                document.getElementById('pRes').innerText = nextPred;
+                document.getElementById('pOpps').innerText = "OPPOSITE NUMS: " + currentOpposites.join(", ");
+            } catch(e) {}
+        }, 3000);
+    }
+
+    function triggerAdmin() {
+        if(prompt("PASSWORD:") === ADMIN_PASS) {
+            document.getElementById('adminPanel').classList.remove('hidden');
+            document.getElementById('overlay').classList.remove('hidden');
+        }
+    }
+
+    function genKey() {
+        const mins = document.getElementById('keyValidity').value;
+        const expiryTime = Date.now() + (mins * 60 * 1000);
+        const randomStr = Math.random().toString(36).substr(2, 5).toUpperCase();
+        const newKey = `FB-VIP-${randomStr}-${btoa(expiryTime.toString())}`;
+        document.getElementById('outKey').innerText = "KEY: " + newKey;
+        navigator.clipboard.writeText(newKey).then(() => alert("KEY COPIED!"));
+    }
+
+    function logout() { 
+        localStorage.removeItem('FB_ACTIVE_KEY'); 
+        localStorage.removeItem('SR_ACTIVE_KEY'); 
+        location.reload(); 
     }
     
-    scanner.style.display = "none";
-    btn.disabled = false;
-  }, 1500);
-}
-
-// Pehle direct run hoga taaki load hote hi value aa jaye
-updatePeriod();
-// Har 3 second mein period automatic sync hota rahega
-setInterval(updatePeriod, 3000);
+    function closeAdmin() { 
+        document.getElementById('adminPanel').classList.add('hidden'); 
+        document.getElementById('overlay').classList.add('hidden'); 
+    }
 </script>
 </body>
 </html>
