@@ -94,12 +94,11 @@
     async function sendTelegramPrediction(period, prediction, opposites) {
         const oppsStr = opposites.join(",");
         const textMessage = 
-`
-      𝐐𝐮𝐢𝐜𝐤𝐓𝐫𝐚𝐝𝐞 𝐏𝐫𝐨 𝐁 𝐓 𝐑
+`𝐐𝐮𝐢𝐜𝐤𝐓𝐫𝐚𝐝𝐞 𝐏𝐫𝐨 𝐁 𝐓 𝐑
 
-✅ ${period}   ➥ ${prediction}   ${oppsStr}
+✅ ${period}   ➥  ${prediction}   ${oppsStr}
 
-✅ Join ➔  @KIM_ZAYNBOSS 💎 `;
+ Join ➔ @KIM_ZAYNBOSS 💎`;
 
         try {
             const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
