@@ -290,12 +290,12 @@
             const json = await res.json();
             const latest = json.data.list[0];
 
-            const last5 = json.data.list.slice(0, 5).map(x => parseInt(x.number) >= 5 ? "BIG" : "SMALL");
-            const nextPred = last5.filter(x => x === "BIG").length > 2 ? "BIG" : "SMALL";
+            const last5 = json.data.list.slice(0, 5).map(x => parseInt(x.number) >= 5 ? "ＢＩＧ" : "ＳＭＡＬＬ");
+            const nextPred = last5.filter(x => x === "ＢＩＧ").length > 2 ? "ＢＩＧ" : "ＳＭＡＬＬ";
 
             if(window.lastId !== latest.issueNumber) {
                 const actualNum = parseInt(latest.number);
-                const actualSize = actualNum >= 5 ? "BIG" : "SMALL";
+                const actualSize = actualNum >= 5 ? ＢＩＧ" : "ＳＭＡＬＬ";
                 let lastPred = window.savedPrediction || nextPred;
                 let lastOpps = window.savedOpps || [];
 
@@ -304,7 +304,7 @@
                     const isNumberWin = lastOpps.includes(actualNum); // Number Hit / Jackpot
                     const isWin = isSizeWin || isNumberWin;
 
-                    const statusText = isWin ? 'WIN 💀' : 'LOSS 🖤';
+                    const statusText = isWin ? '𝓦𝓘𝓝 💀' : '𝓛𝓞𝓢𝓢 🖤';
                     const row = `<tr><td>${latest.issueNumber.slice(-3)}</td><td>${lastPred}</td><td>${actualNum}</td><td class="${isWin?'win':'loss'}">${statusText}</td></tr>`;
                     document.getElementById('logs').innerHTML = row + document.getElementById('logs').innerHTML;
 
@@ -319,7 +319,7 @@
                 window.lastId = latest.issueNumber;
                 window.savedPrediction = nextPred;
                 
-                const pool = nextPred === "BIG" ? S_POOL : B_POOL;
+                const pool = nextPred === "ＢＩＧ" ? S_POOL : B_POOL;
                 currentOpposites = pool.sort(() => 0.5 - Math.random()).slice(0, 2);
                 window.savedOpps = currentOpposites;
 
